@@ -83,37 +83,61 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<!-- Maven Shade Plugin to create fat JAR with all dependencies -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.4</version>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifestEntries>
+							<program-class>ch.ethz.systems.strymon.ds2.wordcount.StatefulWordCount</program-class>
+						</manifestEntries>
+					</archive>
+				</configuration>
 				<executions>
 					<execution>
 						<phase>package</phase>
 						<goals>
-							<goal>shade</goal>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- self-contained jars for each example -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version><!--$NO-MVN-MAN-VER$ -->
+				<executions>
+					<!-- Default Execution -->
+					<execution>
+						<id>default</id>
+						<phase>package</phase>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+
+					<!-- Iteration -->
+					<execution>
+						<id>Iteration</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
 						</goals>
 						<configuration>
-							<finalName>flink-examples-${project.version}-WordCount</finalName>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>ch.ethz.systems.strymon.ds2.wordcount.StatefulWordCount</mainClass>
-								</transformer>
-								<!-- Aggregate service files -->
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-							</transformers>
-							<filters>
-								<filter>
-									<!-- Exclude signature files to avoid security exceptions -->
-									<artifact>*:*</artifact>
-									<excludes>
-										<exclude>META-INF/*.SF</exclude>
-										<exclude>META-INF/*.DSA</exclude>
-										<exclude>META-INF/*.RSA</exclude>
-									</excludes>
-								</filter>
-							</filters>
+							<classifier>WordCount</classifier>
+
+							<archive>
+								<manifestEntries>
+									<program-class>ch.ethz.systems.strymon.ds2.wordcount.StatefulWordCount</program-class>
+								</manifestEntries>
+							</archive>
+							<classifier>WordCount</classifier>
+
 						</configuration>
 					</execution>
 				</executions>
