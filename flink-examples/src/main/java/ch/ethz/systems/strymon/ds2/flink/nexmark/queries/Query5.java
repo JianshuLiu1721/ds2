@@ -62,14 +62,14 @@ public class Query5 {
                 .assignTimestampsAndWatermarks(new TimestampAssigner());
 
         // SELECT B1.auction, count(*) AS num
-        // FROM Bid [RANGE 60 MINUTE SLIDE 1 MINUTE] B1
+        // FROM Bid [RANGE 10 SECOND SLIDE 1 SECOND] B1
         // GROUP BY B1.auction
         DataStream<Tuple2<Long, Long>> windowed = bids.keyBy(new KeySelector<Bid, Long>() {
             @Override
             public Long getKey(Bid bid) throws Exception {
                 return bid.auction;
             }
-        }).timeWindow(Time.minutes(60), Time.minutes(1))
+        }).timeWindow(Time.seconds(10), Time.seconds(1))
                 .aggregate(new CountBids())
                 .name("Sliding Window")
                 .setParallelism(params.getInt("p-window", 1));

@@ -42,10 +42,13 @@ public class PersonSourceFunction extends RichParallelSourceFunction<Person> {
 
     @Override
     public void run(SourceContext<Person> ctx) throws Exception {
+        int parallelism = getRuntimeContext().getNumberOfParallelSubtasks();
+        int ratePerInstance = rate / parallelism;
+
         while (running && eventsCountSoFar < 40_000_000) {
             long emitStartTime = System.currentTimeMillis();
 
-            for (int i = 0; i < rate; i++) {
+            for (int i = 0; i < ratePerInstance; i++) {
                 long nextId = nextId();
                 Random rnd = new Random(nextId);
 
